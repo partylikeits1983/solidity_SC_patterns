@@ -3,11 +3,6 @@ pragma solidity >=0.7.0 <0.9.0;
 /// @title Simple DAO smart contract.
 contract simpleDAO {
     
-    // This simple proof of concept DAO smart contract sends ether to the digital vending machine
-    // only if the majority of the DAO members vote "yes" to buy digital cookies.
-    // If the majority of the DAO members decide not to send ether, the members who deposited ether 
-    // are able to withdraw the ether they deposited.
-    
    
     // address of vending machine
     address payable public VendingMachineAddress;
@@ -38,6 +33,7 @@ contract simpleDAO {
     struct Proposal {
         string name;   // short name (up to 32 bytes)
         uint voteCount; // number of accumulated votes
+    
     }
 
     // address of the person who set up the vote 
@@ -58,11 +54,11 @@ contract simpleDAO {
     // First item in string is the one that will execute the purchase 
     // _VendingMachineAddress is the address where the ether will be sent
     constructor(
-        address payable _VendingMachineAddress,
+        
         uint _voteTime,
         string[] memory proposalNames
     ) {
-        VendingMachineAddress = _VendingMachineAddress;
+        
         chairperson = msg.sender;
         
         voteEndTime = block.timestamp + _voteTime;
@@ -112,6 +108,12 @@ contract simpleDAO {
 
     // proposals are in format 0,1,2,...
     function vote(uint proposal) public {
+        
+        require(balances[msg.sender] !=0, "zero balance");
+        uint256 voteWeight = balances[msg.sender];
+        
+        voters[msg.sender].weight = voteWeight;
+        
         Voter storage sender = voters[msg.sender];
         require(sender.weight != 0, "Has no right to vote");
         require(!sender.voted, "Already voted.");
@@ -142,18 +144,6 @@ contract simpleDAO {
     }
 
 
-   // Individuals can only withdraw what they deposited.
-   // After EndVote function is run and if proposal "buy_cupcakes" won,
-   // users will not be able to withdraw ether
-    function withdraw(uint amount) public{
-        if(balances[msg.sender]>=amount){
-        balances[msg.sender]-=amount;
-        payable(msg.sender).transfer(amount);
-        DAObalance = address(this).balance;
-        }
-    }
-   
-   
     // ends the vote
     // if DAO decided not to buy cupcakes members can withdraw deposited ether
     function EndVote() public {
@@ -165,9 +155,6 @@ contract simpleDAO {
             ended == true,
             "Must count vote first");  
             
-        require(
-            DAObalance >= 1 ether,
-            "Not enough balance in DAO required to buy cupcake. Members may withdraw deposited ether.");
             
         require(
             decision == 0,
