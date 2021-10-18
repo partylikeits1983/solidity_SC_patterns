@@ -13,7 +13,7 @@ contract simpleDAO {
     uint public DAObalance;
     
     // allow withdrawals
-    mapping(address=>uint) balances;
+    mapping(address=>uint) public _balances;
     
     // proposal decision of voters 
     uint decision;
@@ -37,7 +37,7 @@ contract simpleDAO {
     }
 
     // address of the person who set up the vote 
-    address public chairperson;
+    
 
     mapping(address => Voter) public voters;
     Proposal[] public proposals;
@@ -48,6 +48,10 @@ contract simpleDAO {
     error voteAlreadyEnded();
     /// The auction has not ended yet.
     error voteNotYetEnded();
+    
+    
+    uint _voteTime = 200000000;
+    string[] proposalNames = ["2","4"];
 
 
     // Sample input string: ["buy_cupcakes", "no_cupcakes"]
@@ -55,14 +59,13 @@ contract simpleDAO {
     // _VendingMachineAddress is the address where the ether will be sent
     constructor(
         
-        uint _voteTime,
-        string[] memory proposalNames
+
     ) {
         
-        chairperson = msg.sender;
+        //chairperson = msg.sender;
         
         voteEndTime = block.timestamp + _voteTime;
-        voters[chairperson].weight = 1;
+        voters[msg.sender].weight = 0;
 
         for (uint i = 0; i < proposalNames.length; i++) {
 
@@ -73,44 +76,15 @@ contract simpleDAO {
         }
     }
     
-    // anyone can deposit ether to the DAO smart contract
-    // members must deposit at least 1 eth into DAO 
-    // this is to avoid complications during withdrawl if the DAO voted to buy cupcakes
-    function DepositEth() public payable {
-        DAObalance = address(this).balance;
-        
-        if (block.timestamp > voteEndTime)
-            revert voteAlreadyEnded();
-            
-        require(DAObalance <= 1 ether, "1 Ether balance has been reached");
-        
-        DAObalance = address(this).balance;
-        balances[msg.sender]+=msg.value;
-    }
     
     
-    
-    // only the chairperson can decide who can vote
-    function giveRightToVote(address voter) public {
-
-        require(
-            msg.sender == chairperson,
-            "Only chairperson can give right to vote."
-        );
-        require(
-            !voters[voter].voted,
-            "The voter already voted."
-        );
-        require(voters[voter].weight == 0);
-        voters[voter].weight = 1;
-    }
 
 
     // proposals are in format 0,1,2,...
     function vote(uint proposal) public {
         
-        require(balances[msg.sender] !=0, "zero balance");
-        uint256 voteWeight = balances[msg.sender];
+        require(_balances[msg.sender] !=0, "zero balance");
+        uint256 voteWeight = _balances[msg.sender];
         
         voters[msg.sender].weight = voteWeight;
         
