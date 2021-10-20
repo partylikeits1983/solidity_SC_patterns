@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
-/// @title Voting with delegation.
+/// @title Add & Delete Element In Struct
 
 contract workingWithStructs {
     
