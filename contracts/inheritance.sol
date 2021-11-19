@@ -22,3 +22,13 @@ contract B is A {
     }
 
 }
+
+contract C is B {
+    
+    function multiply(uint val) public {
+        
+        balance[msg.sender] *= val;
+        
+    }
+    
+}
