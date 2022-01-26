@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.7.0 <0.9.0;
+
 contract DeFiBank {
 
     uint public deposited;
@@ -13,8 +14,6 @@ contract DeFiBank {
         uint time;
     }
 
-
-    
 
     mapping(address => loan) public loans;
 
@@ -46,7 +45,7 @@ contract DeFiBank {
 
         require(msg.value >= payment);
 
-        divdends += payment - loans[msg.sender].amount;
+        dividends += payment - loans[msg.sender].amount;
 
         lended -= loans[msg.sender].amount;
         loans[msg.sender].amount -= loans[msg.sender].amount;
@@ -74,6 +73,7 @@ contract DeFiBank {
         payable(msg.sender).transfer(amount);
 
         }
+
 
 
 }
