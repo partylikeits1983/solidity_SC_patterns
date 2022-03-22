@@ -30,8 +30,9 @@ contract ERC20_Bank {
     function Deposit(address token, uint amount) external {
 
         require(amount > 0, "Cannot stake 0");
-        balances[msg.sender][token] += amount;
         IERC20(token).transferFrom(msg.sender, address(this), amount);
+        balances[msg.sender][token] += amount;
+
 
     }
 
