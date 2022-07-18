@@ -15,18 +15,18 @@ contract Test {
 
     mapping(address => Params1) public map;
 
-    function createRequest(uint value) public {
+    // @dev input => ["0",["1","2"]]
+    function createRequest(Params1 memory _params) public {
         Params1 storage newParams = map[msg.sender];
-        newParams.a = value;
-        newParams.parameters.b = 1;
-        newParams.parameters.c = 2;
+        newParams.a = _params.a;
+        newParams.parameters.b = _params.parameters.b;
+        newParams.parameters.c = _params.parameters.c;
         
     }
 
-    function getVals() public view returns(uint,uint) {
-        Params2 memory vals = map[msg.sender].parameters;
-        return (vals.b,vals.c);
+    function getVals() public view returns(uint,uint,uint) {
+        Params1 memory vals = map[msg.sender];
+        return (vals.a,vals.parameters.b,vals.parameters.c);
     } 
 }
-
 
