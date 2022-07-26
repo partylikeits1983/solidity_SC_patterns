@@ -3,11 +3,24 @@ pragma solidity ^0.8.15;
 
 // NOTE: Deploy this contract first
 contract A {
-    // NOTE: storage layout must be the same as contract A
     uint public a;
     uint public b;
     address public DAI;
     address public USD;
+
+    struct inputA {
+        uint a;
+        uint b;
+        inputB params;
+    }
+
+    struct inputB {
+        uint c;
+        uint d;
+    }
+
+    mapping(address => inputA) public mapA;
+
 }
 
 contract B is A {
@@ -35,6 +48,15 @@ contract B is A {
         USD = _address;
         return USD;
     }
+
+    function setMap(inputA memory _params) public returns (uint) {
+        mapA[msg.sender].a = _params.a;
+        mapA[msg.sender].b = _params.b;
+        mapA[msg.sender].params.c = _params.params.c;
+        mapA[msg.sender].params.d = _params.params.d;
+
+        return 1e18;
+    }
 }
 
 contract C is A {
@@ -46,7 +68,6 @@ contract C is A {
     }
 
     function setA(uint _num) public returns (uint) {
-        // A's storage is set, B is not modified.
         bytes memory data = abi.encodeWithSignature("setA(uint256)", _num);
         (bool success, bytes memory returnData) = contractB.delegatecall(data);
         require(success);
@@ -54,7 +75,6 @@ contract C is A {
     }
 
     function setB(uint _num) public returns (uint) {
-        // A's storage is set, B is not modified.
         bytes memory data = abi.encodeWithSignature("setB(uint256)", _num);
         (bool success, bytes memory returnData) = contractB.delegatecall(data);
         require(success);
@@ -62,7 +82,6 @@ contract C is A {
     }
 
     function setDAI(address _address) public returns (uint) {
-        // A's storage is set, B is not modified.
         bytes memory data = abi.encodeWithSignature("setDAI(address)", _address);
         (bool success, bytes memory returnData) = contractB.delegatecall(data);
         require(success);
@@ -70,9 +89,17 @@ contract C is A {
     }
 
     function setUSD(address _address) public returns (uint) {
-        // A's storage is set, B is not modified.
         bytes memory data = abi.encodeWithSignature("setUSD(address)", _address);
         (bool success, bytes memory returnData) = contractB.delegatecall(data);
+        require(success);
+        return abi.decode(returnData, (uint));
+    }
+
+    function setMap(inputA memory _params) public returns (uint) {
+        bytes memory data = abi.encodeWithSignature("setMap((uint256,uint256,(uint256,uint256)))", _params);
+
+        (bool success, bytes memory returnData) = contractB.delegatecall(data);
+
         require(success);
         return abi.decode(returnData, (uint));
     }
