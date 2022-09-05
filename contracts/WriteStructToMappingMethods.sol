@@ -20,10 +20,12 @@ contract StructTest {
 
     mapping(address => mapping(address => mapping(uint => StructA))) public MappingA;
 
+    // 202193 gas
     function write_mapping(address pair, address user, uint ID, StructA memory _structA) public {
         MappingA[pair][user][ID] = _structA;
     }
 
+    // 202234 gas
     function write_mapping2(address pair, address user, uint ID, StructA memory _structA) public {
         MappingA[pair][user][ID].tokenA = _structA.tokenA;
         MappingA[pair][user][ID].tokenB = _structA.tokenB;
